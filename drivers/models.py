@@ -4,12 +4,22 @@ from django.conf import settings
 
 class Driver(models.Model):
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+
+
+    VEHICLE_CHOICES = [
+        ("bike", "Bike"),
+        ("car", "Car"),
+        ("van", "Van"),
+        ("truck", "Truck"),  ]
+
+    vehicle_type = models.CharField(max_length=50, choices=[
+        ('car', 'Car'),
+        ('bike', 'Bike'),
+        ('truck', 'Truck'), ])   
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name= "driver_profile" )
 
     phone_number = models.CharField(max_length=15)
-
-    vehicle_type = models.CharField(max_length=50)
 
     license_number = models.CharField(  max_length=50,  unique=True)
 

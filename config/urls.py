@@ -18,9 +18,12 @@ urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
     path('api/shipments/',include('shipments.urls') ),
+    path('api/accounts/', include('accounts.urls')),
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh/', TokenRefreshView.as_view()),
     path('api/drivers/', include('drivers.urls')),
+    path('api/notifications/', include('notifications.urls')),
+    path('api/tracking/', include('tracking.urls')),
 
 
 ]
