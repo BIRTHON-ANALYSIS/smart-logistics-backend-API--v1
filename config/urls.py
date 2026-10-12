@@ -1,4 +1,4 @@
-
+from .health import health_check
 from django.contrib import admin
 from django.urls import path,include
 from django.http import JsonResponse
@@ -24,6 +24,9 @@ urlpatterns = [
     path('api/drivers/', include('drivers.urls')),
     path('api/notifications/', include('notifications.urls')),
     path('api/tracking/', include('tracking.urls')),
+    path('frontend/', include('frontend.urls')),
+    path('api/earnings/', include('earnings.urls')),
+    path("health/", health_check, name="health"),
 
 
 ]

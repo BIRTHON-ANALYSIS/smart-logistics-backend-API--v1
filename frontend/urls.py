@@ -1,0 +1,65 @@
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path(
+        "login/",
+        views.login_view,
+        name="login",
+    ),
+    path(
+        "logout/",
+        views.logout_view,
+        name="logout",
+    ),
+    path(
+        "dashboard/",
+        views.dashboard,
+        name="dashboard",
+    ),
+    path(
+        "shipments/create/",
+        views.create_shipment,
+        name="create-shipment",
+    ),
+    path(
+        "shipments/<int:pk>/",
+        views.shipment_detail,
+        name="shipment-detail",
+    ),
+    path(
+        "shipments/<int:pk>/status/",
+        views.update_shipment_status,
+        name="update-shipment-status",
+    ),
+    path(
+        "shipments/<int:pk>/assign-driver/",
+        views.assign_driver,
+        name="assign-driver",
+    ),
+    path(
+        "track/",
+        views.track_shipment,
+        name="track-shipment",
+    ),
+    path(
+        "notifications/",
+        views.notifications,
+        name="notifications",
+    ),
+    path(
+        "notifications/<int:pk>/read/",
+        views.mark_notification_read,
+        name="mark-notification-read",
+    ),
+    path(
+        "notifications/<int:pk>/delete/",
+        views.delete_notification,
+        name="delete-notification",
+    ),path(
+        "earnings/",
+        views.earnings_view,
+        name="earnings-view",
+    ),  
+]

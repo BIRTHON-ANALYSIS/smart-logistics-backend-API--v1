@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}
+Track Shipment
+{% endblock %}
+
+{% block content %}
+
+<section class="card">
+
+    <h1>Track Shipment</h1>
+
+    <form method="get">
+
+        <div class="form-group">
+
+            <label for="tracking_number">
+                Tracking Number
+            </label>
+
+            <input
+                type="text"
+                id="tracking_number"
+                name="tracking_number"
+                value="{{ tracking_number }}"
+                placeholder="Enter tracking number"
+            >
+
+        </div>
+
+        <button type="submit">
+            Track
+        </button>
+
+    </form>
+
+</section>
+
+
+{% if shipment %}
+
+<section class="card">
+
+    <h2>
+        {{ shipment.tracking_number }}
+    </h2>
+
+    <div class="tracking-flow">
+
+        {% for item in shipment.history %}
+            <div class="tracking-step">
+                <strong>
+                    {{ item.get_status_display }}
+                </strong>
+
+                <small>
+                    {{ item.created_at }}
+                </small>
+            </div>
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

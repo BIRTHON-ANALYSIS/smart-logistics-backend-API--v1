@@ -3,11 +3,23 @@
 from rest_framework.routers import DefaultRouter, path
 from .views import DriverShipmentListView, DriverViewSet
 
-router = DefaultRouter()
-router.register(r"", DriverViewSet, basename="driver")
+from django.urls import path
 
-urlpatterns = router.urls
-path( "me/shipments/",
-    DriverShipmentListView.as_view(),
-    name="driver-shipments",
+from .views import (
+    DriverDetailView,
+    DriverListCreateView,
 )
+
+
+urlpatterns = [
+    path(
+        "",
+        DriverListCreateView.as_view(),
+        name="driver-list-create",
+    ),
+    path(
+        "<int:pk>/",
+        DriverDetailView.as_view(),
+        name="driver-detail",
+    ),
+]

@@ -1,0 +1,72 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}Smart Logistics{% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a href="{% url 'dashboard' %}" class="brand">
+        Smart Logistics
+    </a>
+
+    {% if request.user.is_authenticated %}
+
+        <nav>
+            <a href="{% url 'dashboard' %}">
+                Dashboard
+            </a>
+
+            <a href="{% url 'track-shipment' %}">
+                Track
+            </a>
+
+            <a href="{% url 'notifications' %}">
+                Notifications
+            </a>
+            <a href="{% url 'earnings-view' %}">
+                Earnings
+            </a>
+            <a href="{% url 'logout' %}">
+                Logout
+            </a>
+        </nav>
+
+    {% endif %}
+
+</header>
+
+<main class="container">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - Smart Logistics
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Dashboard</h1>
+
+        <p>
+            Welcome,
+            <strong>{{ request.user.username }}</strong>
+        </p>
+
+        <span class="role">
+            {{ request.user.get_role_display }}
+        </span>
+    </div>
+
+    <a
+        href="{% url 'track-shipment' %}"
+        class="button"
+    >
+        Track Shipment
+    </a>
+
+</div>
+
+
+{% if request.user.role == "customer" %}
+
+<section class="card">
+
+    <h2>Create Shipment</h2>
+
+    <form
+        method="post"
+        action="{% url 'create-shipment' %}"
+    >
+
+        {% csrf_token %}
+
+        {{ shipment_form.as_p }}
+
+        <button type="submit">
+            Create Shipment
+        </button>
+
+    </form>
+
+</section>
+
+{% endif %}
+
+
+<section class="card">
+
+    <h2>Shipments</h2>
+
+    {% if shipments %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Tracking</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th>Driver</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for shipment in shipments %}
+
+                    <tr>
+
+                        <td>
+                            {{ shipment.tracking_number }}
+                        </td>
+
+                        <td>
+                            {{ shipment.customer.username }}
+                        </td>
+
+                        <td>
+                            <span class="status">
+                                {{ shipment.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if shipment.driver %}
+                                {{ shipment.driver.user.username }}
+                            {% else %}
+                                Unassigned
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a
+                                href="{% url 'shipment-detail' shipment.pk %}"
+                            >
+                                View
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <p>No shipments found.</p>
+
+    {% endif %}
+
+</section>
+
+
+{% if request.user.role == "admin" or request.user.role == "dispatcher" %}
+
+<section class="card">
+
+    <h2>Drivers</h2>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Driver</th>
+                    <th>Vehicle</th>
+                    <th>Available</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for driver in drivers %}
+
+                <tr>
+                    <td>
+                        {{ driver.user.username }}
+                    </td>
+
+                    <td>
+                        {{ driver.get_vehicle_type_display }}
+                    </td>
+
+                    <td>
+                        {% if driver.is_available %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

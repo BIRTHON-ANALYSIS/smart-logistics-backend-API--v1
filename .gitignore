@@ -1,0 +1,26 @@
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+smart/
+venv/
+.venv/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*.log
+
+# Local databases
+db.sqlite3
+
+# Collected static files
+staticfiles/
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

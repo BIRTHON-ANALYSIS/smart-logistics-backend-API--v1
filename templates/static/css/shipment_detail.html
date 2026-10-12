@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}
+Shipment {{ shipment.tracking_number }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>
+            Shipment {{ shipment.tracking_number }}
+        </h1>
+
+        <p>
+            {{ shipment.get_status_display }}
+        </p>
+    </div>
+</div>
+
+
+<section class="card">
+
+    <h2>Shipment Information</h2>
+
+    <div class="details-grid">
+
+        <div>
+            <strong>Sender</strong>
+            <p>{{ shipment.sender_name }}</p>
+        </div>
+
+        <div>
+            <strong>Receiver</strong>
+            <p>{{ shipment.receiver_name }}</p>
+        </div>
+
+        <div>
+            <strong>Pickup</strong>
+            <p>{{ shipment.pickup_address }}</p>
+        </div>
+
+        <div>
+            <strong>Delivery</strong>
+            <p>{{ shipment.delivery_address }}</p>
+        </div>
+
+        <div>
+            <strong>Driver</strong>
+
+            <p>
+                {% if shipment.driver %}
+                    {{ shipment.driver.user.username }}
+                {% else %}
+                    Not assigned
+                {% endif %}
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="card">
+
+    <h2>Shipment History</h2>
+
+    <div class="timeline">
+
+        {% for item in history %}
+
+            <div class="timeline-item">
+
+                <strong>
+                    {{ item.get_status_display }}
+                </strong>
+
+                <span>
+                    {{ item.created_at }}
+                </span>
+
+            </div>
+
+        {% empty %}
+
+            <p>No history available.</p>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+{% if request.user.role == "admin" or request.user.role == "dispatcher" or shipment.driver.user == request.user %}
+
+<section class="card">
+
+    <h2>Update Status</h2>
+
+    <form
+        method="post"
+        action="{% url 'update-shipment-status' shipment.pk %}"
+    >
+
+        {% csrf_token %}
+
+        {{ status_form.as_p }}
+
+        <button type="submit">
+            Update Status
+        </button>
+
+    </form>
+
+</section>
+
+{% endif %}
+
+
+{% if request.user.role == "admin" or request.user.role == "dispatcher" %}
+
+<section class="card">
+
+    <h2>Assign Driver</h2>
+
+    <form
+        method="post"
+        action="{% url 'assign-driver' shipment.pk %}"
+    >
+
+        {% csrf_token %}
+
+        {{ assign_driver_form.as_p }}
+
+        <button type="submit">
+            Assign Driver
+        </button>
+
+    </form>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

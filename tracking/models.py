@@ -1,6 +1,7 @@
 from django.db import models
 from django.db import models
 from drivers.models import Driver
+from shipments.models import Shipment
 
 
 class DriverLocation(models.Model):
@@ -9,6 +10,13 @@ class DriverLocation(models.Model):
         on_delete=models.CASCADE,
         related_name="locations"
     )
+    shipment = models.ForeignKey(
+    Shipment,
+    on_delete=models.CASCADE,
+    related_name="tracking_locations",
+    null=True,
+    blank=True,
+)
 
     latitude = models.DecimalField(
         max_digits=9,

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}
+Earnings - Smart Logistics
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Earnings</h1>
+        <p>Driver earnings and payout status.</p>
+    </div>
+
+</div>
+
+<section class="card">
+
+    {% if earnings %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Shipment</th>
+                        <th>Driver</th>
+                        <th>Distance</th>
+                        <th>Rate/KM</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for earning in earnings %}
+
+                    <tr>
+
+                        <td>
+                            {{ earning.shipment.tracking_number }}
+                        </td>
+
+                        <td>
+                            {{ earning.driver.user.username }}
+                        </td>
+
+                        <td>
+                            {{ earning.distance_km }} km
+                        </td>
+
+                        <td>
+                            {{ earning.rate_per_km }}
+                        </td>
+
+                        <td>
+                            {{ earning.amount }}
+                        </td>
+
+                        <td>
+                            <span class="status">
+                                {{ earning.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ earning.created_at }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <p>No earnings found.</p>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

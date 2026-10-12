@@ -17,7 +17,8 @@ class DriverLocationSerializer(serializers.ModelSerializer):
             "recorded_at",
         ]
 
-
+read_only_fields = [
+    "id",'driver', "recorded_at"    ]
 
 
 
