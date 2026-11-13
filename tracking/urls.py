@@ -1,5 +1,5 @@
-from django.urls import path
-from .views import  GeocodeAddressView,   UpdateLocationView
+from django.urls import path,include
+from .views import  GeocodeAddressView, ShipmentTrackingView,   UpdateLocationView
 
 urlpatterns = [
     path(
@@ -10,7 +10,18 @@ urlpatterns = [
     path(
         "geocode/",
         GeocodeAddressView.as_view(),
-        name="geocode-address",
+            name="geocode-address",
+        ),
+    path(
+        "shipments/<str:tracking_number>/",
+        ShipmentTrackingView.as_view(),
+        name="shipment-tracking",
     ),
+    path(
+    "shipments/<str:tracking_number>/",
+    ShipmentTrackingView.as_view(),
+    name="shipment-tracking",
+),
+
 ]
     

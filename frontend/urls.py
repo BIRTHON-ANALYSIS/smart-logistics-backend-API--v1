@@ -60,6 +60,6 @@ urlpatterns = [
     ),path(
         "earnings/",
         views.earnings_view,
-        name="earnings-view",
-    ),  
+        name="earnings",
+    ),  path("signup/", views.signup_view, name="signup"),
 ]

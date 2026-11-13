@@ -7,7 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
-
+from django.contrib import messages
+from django.contrib.auth import get_user_model, password_validation
+from django.core.exceptions import ValidationError
+from django.shortcuts import render, redirect
 from accounts.models import User
 from drivers.models import Driver
 from earnings.models import DriverEarning
@@ -383,5 +386,83 @@ def earnings_view(request):
         "earnings.html",
         {
             "earnings": earnings,
+        },
+    )
+def signup_view(request):
+    User = get_user_model()
+
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
+    errors = []
+    values = {}
+
+    if request.method == "POST":
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip().lower()
+        phone_number = request.POST.get("phone_number", "").strip()
+        password1 = request.POST.get("password1", "")
+        password2 = request.POST.get("password2", "")
+
+        values = {
+            "username": username,
+            "email": email,
+            "phone_number": phone_number,
+        }
+
+        if not username:
+            errors.append("Username is required.")
+
+        if not email:
+            errors.append("Email address is required.")
+
+        if username and User.objects.filter(
+            username__iexact=username
+        ).exists():
+            errors.append("That username is already registered.")
+
+        if email and User.objects.filter(
+            email__iexact=email
+        ).exists():
+            errors.append("That email address is already registered.")
+
+        if not password1:
+            errors.append("Password is required.")
+        elif password1 != password2:
+            errors.append("The passwords do not match.")
+        else:
+            candidate_user = User(
+                username=username,
+                email=email,
+            )
+            try:
+                password_validation.validate_password(
+                    password1,
+                    user=candidate_user,
+                )
+            except ValidationError as exc:
+                errors.extend(exc.messages)
+
+        if not errors:
+            User.objects.create_user(
+                username=username,
+                email=email,
+                phone_number=phone_number,
+                password=password1,
+                role="customer",
+            )
+
+            messages.success(
+                request,
+                "Your account was created successfully. You can now sign in.",
+            )
+            return redirect("login")
+
+    return render(
+        request,
+        "signup.html",
+        {
+            "errors": errors,
+            "values": values,
         },
     )

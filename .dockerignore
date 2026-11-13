@@ -10,3 +10,8 @@ venv/
 .venv/
 .vscode/
 .idea/
+
+.env
+.env.*
+!.env.example
+.pytest_cache/

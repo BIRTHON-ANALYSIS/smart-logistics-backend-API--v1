@@ -8,7 +8,7 @@ from .serializers import DriverSerializer
 
 
 class DriverListCreateView(generics.ListCreateAPIView):
-    queryset = Driver.objects.all()
+    queryset = Driver.objects.select_related("user").order_by("pk")
     serializer_class = DriverSerializer
     permission_classes = [IsAuthenticated]
 

@@ -2,14 +2,18 @@ services:
   web:
     build: .
     container_name: smartlog_web
-    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+  
+    command: daphne -b 0.0.0.0 -p 8000 config.asgi:application
     env_file:
-      - .env
+      - .env.docker
     ports:
       - "8000:8000"
     depends_on:
       - db
       - redis
+    restart: unless-stopped
+    volumes:
+      - static_data:/app/staticfiles
 
   db:
     image: postgres:16
@@ -19,25 +23,27 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    restart: unless-stopped
+    
   redis:
     image: redis:7-alpine
     container_name: smartlog_redis
-    ports:
-      - "6379:6379"
+    
+    restart: unless-stopped
 
   celery:
     build: .
     container_name: smartlog_celery
     command: celery -A config worker --loglevel=info
     env_file:
-      - .env
+      - .env.docker
     depends_on:
       - db
       - redis
 
 volumes:
   postgres_data:
+  static_data:

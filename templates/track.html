@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}
+Track Shipment
+{% endblock %}
+
+{% block content %}
+
+<script>
+  const trackingNumber = "SHIP-123"; // Replace with the assigned shipment number.
+
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const socketUrl =
+    `${protocol}//${window.location.host}/ws/shipments/${encodeURIComponent(trackingNumber)}/`;
+
+  let socket;
+  let watchId = null;
+
+  function startTracking() {
+    if (!("geolocation" in navigator)) {
+      console.error("This browser does not support GPS location.");
+      return;
+    }
+
+    socket = new WebSocket(socketUrl);
+
+    socket.addEventListener("open", () => {
+      console.log("Tracking WebSocket connected.");
+      startGpsWatch();
+    });
+
+    socket.addEventListener("message", (event) => {
+      const message = JSON.parse(event.data);
+
+      if (message.type === "error") {
+        console.error(message.message);
+      } else if (message.type === "tracking_snapshot") {
+        console.log("Initial shipment snapshot:", message.shipment);
+      } else if (message.type === "location_updated") {
+        console.log("Location update accepted:", message.location);
+      }
+    });
+
+    socket.addEventListener("close", () => {
+      stopGpsWatch();
+      console.log("Tracking WebSocket disconnected.");
+    });
+
+    socket.addEventListener("error", (error) => {
+      console.error("Tracking WebSocket error:", error);
+    });
+  }
+
+  function startGpsWatch() {
+    if (watchId !== null) return;
+
+    watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+        socket.send(JSON.stringify({
+          type: "location_update",
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }));
+      },
+      (error) => {
+        console.error("Unable to get GPS location:", error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 15000,
+      }
+    );
+  }
+
+  function stopGpsWatch() {
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+  }
+
+  // Call when the driver starts a delivery.
+  startTracking();
+
+  // Call this when the driver stops tracking or leaves the page.
+  function stopTracking() {
+    stopGpsWatch();
+
+    if (socket && socket.readyState < WebSocket.CLOSING) {
+      socket.close();
+    }
+  }
+
+  window.addEventListener("pagehide", stopTracking);
+</script>
+<section class="card">
+
+    <h1>Track Shipment</h1>
+
+    <form method="get">
+
+        <div class="form-group">
+
+            <label for="tracking_number">
+                Tracking Number
+            </label>
+
+            <input
+                type="text"
+                id="tracking_number"
+                name="tracking_number"
+                value="{{ tracking_number }}"
+                placeholder="Enter tracking number"
+            >
+
+        </div>
+
+        <button type="submit">
+            Track
+        </button>
+
+    </form>
+
+</section>
+
+<div id="shipment-tracking" data-tracking-number="{{ shipment.tracking_number }}">
+  <p id="tracking-status" role="status">Connecting to live tracking…</p>
+  <div id="tracking-map" style="height: 420px;"></div>
+</div>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% load static %}
+<script src="{% static 'tracking/customer_tracking.js' %}" defer></script>
+{% if shipment %}
+
+<section class="card">
+
+    <h2>
+        {{ shipment.tracking_number }}
+    </h2>
+
+    <div class="tracking-flow">
+
+        {% for item in shipment.history %}
+            <div class="tracking-step">
+                <strong>
+                    {{ item.get_status_display }}
+                </strong>
+
+                <small>
+                    {{ item.created_at }}
+                </small>
+            </div>
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}
